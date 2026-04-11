@@ -71,3 +71,92 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach(i => i.classList.remove('selected'));
             this.classList.add('selected');
             currentSelection = this;
+            basePrice = parseFloat(this.dataset.price);
+            activeType = this.dataset.type;
+            refreshBillingEngine();
+        });
+    });
+
+    if (inputNights) {
+        inputNights.addEventListener('input', refreshBillingEngine);
+    }
+
+    const dropdownSort = document.getElementById('sort-select');
+    const containerHotelGrid = document.getElementById('hotel-grid');
+
+    if (dropdownSort && containerHotelGrid) {
+        dropdownSort.addEventListener('change', function() {
+            const order = this.value;
+            if (order === 'none') return;
+            
+            const hotelElements = Array.from(containerHotelGrid.getElementsByClassName('hotel-item'));
+
+            hotelElements.sort((a, b) => {
+                const valA = parseFloat(a.dataset.price);
+                const valB = parseFloat(b.dataset.price);
+                if (order === 'asc') return valA - valB;
+                return valB - valA;
+            });
+
+            containerHotelGrid.innerHTML = '';
+            hotelElements.forEach(element => containerHotelGrid.appendChild(element));
+        });
+    }
+
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(msg => {
+        msg.style.cursor = 'pointer';
+        
+        msg.addEventListener('click', () => {
+            msg.classList.add('fade-out');
+            setTimeout(() => msg.remove(), 500);
+        });
+
+        if (!msg.innerText.includes('CRITICAL')) {
+            setTimeout(() => {
+                if(document.body.contains(msg)) {
+                    msg.classList.add('fade-out');
+                    setTimeout(() => msg.remove(), 500);
+                }
+            }, 4000);
+        }
+    });
+
+    // --- NEW: Automatically pop the modal open based on URL parameter ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const modalToOpen = urlParams.get('modal');
+
+    if (modalToOpen && modal) {
+        modal.style.display = 'flex';
+        if (window.switchTab) {
+            window.switchTab(modalToOpen);
+        }
+        // Clean the URL bar so the modal doesn't pop open if they hit refresh manually
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+
+window.switchTab = function(tabName) {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const forms = document.querySelectorAll('.auth-form');
+    const resetTab = document.getElementById('resetTab');
+
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+    forms.forEach(form => form.classList.remove('active'));
+
+    if (resetTab) resetTab.style.display = 'none';
+
+    if (tabName === 'login') {
+        tabBtns[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+    } else if (tabName === 'signup') {
+        tabBtns[1].classList.add('active');
+        document.getElementById('signupForm').classList.add('active');
+    } else if (tabName === 'reset') {
+        if (resetTab) {
+            resetTab.style.display = 'block';
+            resetTab.classList.add('active');
+        }
+        document.getElementById('resetForm').classList.add('active');
+    }
+};
