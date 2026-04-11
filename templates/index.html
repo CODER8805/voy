@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero aerorail">
+    <div class="glass-panel hero-content">
+        <h1 class="glow-text">Experience VoyageSync</h1>
+        <p>The premium portal for your AeroRail and global travel needs.</p>
+        <div class="cta-group">
+            <a href="{{ url_for('flights') }}" class="neon-btn">Search Flights</a>
+            <a href="{{ url_for('hotels') }}" class="neon-btn">Search Hotels</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
