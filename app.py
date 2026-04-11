@@ -75,24 +75,30 @@ def signup():
     username = request.form.get('username')
     email = request.form.get('email')
     password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password') # <-- NEW
+    
+    # --- NEW: Check if passwords match ---
+    if password != confirm_password:
+        flash('Passwords do not match. Please try again.', 'error')
+        return redirect(url_for('index', modal='signup'))
     
     existing_username = User.query.filter_by(username=username).first()
     if existing_username:
-        flash('That username is already taken. Please choose another one.', 'error signup-error')
-        return redirect(url_for('index'))
+        flash('That username is already taken. Please choose another one.', 'error')
+        return redirect(url_for('index', modal='signup')) 
 
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
-        flash('An account with that email already exists. Try logging in!', 'error signup-error')
-        return redirect(url_for('index'))
+        flash('An account with that email already exists. Try logging in!', 'error')
+        return redirect(url_for('index', modal='login')) 
         
     if len(password) < 8:
-        flash('Security Alert: Password must be at least 8 characters long.', 'error signup-error')
-        return redirect(url_for('index'))
+        flash('Security Alert: Password must be at least 8 characters long.', 'error')
+        return redirect(url_for('index', modal='signup')) 
         
     if not re.search(r"[@%&$!*#?^]", password):
-        flash('Security Alert: Password must contain at least one special character (e.g., @, %, &, $).', 'error signup-error')
-        return redirect(url_for('index'))
+        flash('Security Alert: Password must contain at least one special character (e.g., @, %, &, $).', 'error')
+        return redirect(url_for('index', modal='signup')) 
         
     phrase = " ".join(random.choices(WORD_LIST, k=10))
     phrase_hash = generate_password_hash(phrase, method='pbkdf2:sha256')
@@ -116,7 +122,8 @@ def login():
         session['user_id'] = user.id
         flash('Login successful. Welcome back!', 'success')
     else:
-        flash('Invalid email or password. Please try again.', 'error login-error')
+        flash('Invalid email or password. Please try again.', 'error')
+        return redirect(url_for('index', modal='login')) 
         
     return redirect(url_for('index'))
 
@@ -130,18 +137,19 @@ def reset_password():
     
     if user and check_password_hash(user.recovery_hash, phrase):
         if len(new_password) < 8:
-            flash('Password reset failed: New password must be at least 8 characters long.', 'error reset-error')
-            return redirect(url_for('index'))
+            flash('Password reset failed: New password must be at least 8 characters long.', 'error')
+            return redirect(url_for('index', modal='reset'))
             
         if not re.search(r"[@%&$!*#?^]", new_password):
-            flash('Password reset failed: New password must contain a special character.', 'error reset-error')
-            return redirect(url_for('index'))
+            flash('Password reset failed: New password must contain a special character.', 'error')
+            return redirect(url_for('index', modal='reset'))
 
         user.password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
         db.session.commit()
         flash('Password successfully reset! You can now log in with your new password.', 'success')
     else:
-        flash('Reset failed. Ensure your 10-word phrase is typed exactly.', 'error reset-error')
+        flash('Reset failed. Ensure your 10-word phrase is typed exactly.', 'error')
+        return redirect(url_for('index', modal='reset'))
         
     return redirect(url_for('index'))
 

@@ -1,24 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    if (document.querySelector('.hero-content')) {
+        gsap.from(".hero-content h1", { duration: 1.2, y: 60, opacity: 0, ease: "expo.out", delay: 0.1 });
+        gsap.from(".hero-content p", { duration: 1.2, y: 40, opacity: 0, ease: "expo.out", delay: 0.3 });
+        gsap.from(".hero-content .neon-btn", { 
+            duration: 1, 
+            y: 30, 
+            opacity: 0, 
+            stagger: 0.15, 
+            ease: "back.out(1.5)", 
+            delay: 0.5 
+        });
+        gsap.from(".glass-nav", { duration: 1, y: -20, opacity: 0, ease: "power2.out" });
+    }
+
     const modal = document.getElementById('authModal');
     const openModalBtn = document.getElementById('openModalBtn');
     const closeSpan = document.getElementsByClassName('close')[0];
 
+    function openModal() {
+        modal.style.display = 'flex';
+        gsap.fromTo(modal, {opacity: 0}, {opacity: 1, duration: 0.3, ease: "power2.out"});
+        gsap.fromTo(".modal-content",
+            { y: 60, scale: 0.9, opacity: 0, rotationX: -15, transformPerspective: 1000 },
+            { y: 0, scale: 1, opacity: 1, rotationX: 0, duration: 0.7, ease: "expo.out" }
+        );
+        
+        const activeForm = document.querySelector('.auth-form.active');
+        if(activeForm) {
+            gsap.fromTo(activeForm.querySelectorAll("input, button, p, h3"),
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "back.out(1.2)", delay: 0.2 }
+            );
+        }
+    }
+
+    function closeModal() {
+        gsap.to(".modal-content", { 
+            y: 30, scale: 0.95, opacity: 0, duration: 0.3, ease: "power2.in" 
+        });
+        gsap.to(modal, { 
+            opacity: 0, duration: 0.3, delay: 0.1, 
+            onComplete: () => modal.style.display = 'none' 
+        });
+    }
+
     if (openModalBtn) {
         openModalBtn.onclick = function(e) {
             e.preventDefault();
-            modal.style.display = 'flex';
+            openModal();
         }
     }
 
     if (closeSpan) {
-        closeSpan.onclick = function() {
-            modal.style.display = 'none';
-        }
+        closeSpan.onclick = closeModal;
     }
 
     window.onclick = function(event) {
         if (event.target === modal) {
-            modal.style.display = 'none';
+            closeModal();
         }
     }
 
@@ -122,16 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- NEW: Automatically pop the modal open based on URL parameter ---
     const urlParams = new URLSearchParams(window.location.search);
     const modalToOpen = urlParams.get('modal');
 
     if (modalToOpen && modal) {
-        modal.style.display = 'flex';
+        openModal();
         if (window.switchTab) {
             window.switchTab(modalToOpen);
         }
-        // Clean the URL bar so the modal doesn't pop open if they hit refresh manually
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
@@ -141,22 +179,38 @@ window.switchTab = function(tabName) {
     const forms = document.querySelectorAll('.auth-form');
     const resetTab = document.getElementById('resetTab');
 
+    let newForm = null;
+
     tabBtns.forEach(btn => btn.classList.remove('active'));
-    forms.forEach(form => form.classList.remove('active'));
+    forms.forEach(form => {
+        if(form.classList.contains('active')) {
+            gsap.to(form, { opacity: 0, x: -20, duration: 0.2, onComplete: () => form.classList.remove('active') });
+        }
+    });
 
     if (resetTab) resetTab.style.display = 'none';
 
     if (tabName === 'login') {
         tabBtns[0].classList.add('active');
-        document.getElementById('loginForm').classList.add('active');
+        newForm = document.getElementById('loginForm');
     } else if (tabName === 'signup') {
         tabBtns[1].classList.add('active');
-        document.getElementById('signupForm').classList.add('active');
+        newForm = document.getElementById('signupForm');
     } else if (tabName === 'reset') {
         if (resetTab) {
             resetTab.style.display = 'block';
             resetTab.classList.add('active');
         }
-        document.getElementById('resetForm').classList.add('active');
+        newForm = document.getElementById('resetForm');
+    }
+
+    if(newForm) {
+        setTimeout(() => {
+            newForm.classList.add('active');
+            gsap.fromTo(newForm.querySelectorAll("input, button, p, h3"),
+                { x: 20, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: "power2.out" }
+            );
+        }, 200);
     }
 };
