@@ -1,17 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // --- FIXED: Changed from() to fromTo() to explicitly force visibility ---
     if (document.querySelector('.hero-content')) {
-        gsap.from(".hero-content h1", { duration: 1.2, y: 60, opacity: 0, ease: "expo.out", delay: 0.1 });
-        gsap.from(".hero-content p", { duration: 1.2, y: 40, opacity: 0, ease: "expo.out", delay: 0.3 });
-        gsap.from(".hero-content .neon-btn", { 
-            duration: 1, 
-            y: 30, 
-            opacity: 0, 
-            stagger: 0.15, 
-            ease: "back.out(1.5)", 
-            delay: 0.5 
-        });
-        gsap.from(".glass-nav", { duration: 1, y: -20, opacity: 0, ease: "power2.out" });
+        gsap.fromTo(".hero-content h1", 
+            { y: 60, opacity: 0 }, 
+            { duration: 1.2, y: 0, opacity: 1, ease: "expo.out", delay: 0.1 }
+        );
+        gsap.fromTo(".hero-content p", 
+            { y: 40, opacity: 0 }, 
+            { duration: 1.2, y: 0, opacity: 1, ease: "expo.out", delay: 0.3 }
+        );
+        gsap.fromTo(".hero-content .neon-btn", 
+            { y: 30, opacity: 0 }, 
+            { duration: 1, y: 0, opacity: 1, stagger: 0.15, ease: "back.out(1.5)", delay: 0.5 }
+        );
+        gsap.fromTo(".glass-nav", 
+            { y: -20, opacity: 0 }, 
+            { duration: 1, y: 0, opacity: 1, ease: "power2.out" }
+        );
     }
 
     const modal = document.getElementById('authModal');
