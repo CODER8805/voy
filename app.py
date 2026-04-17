@@ -75,9 +75,8 @@ def signup():
     username = request.form.get('username')
     email = request.form.get('email')
     password = request.form.get('password')
-    confirm_password = request.form.get('confirm_password') # <-- NEW
+    confirm_password = request.form.get('confirm_password')
     
-    # --- NEW: Check if passwords match ---
     if password != confirm_password:
         flash('Passwords do not match. Please try again.', 'error')
         return redirect(url_for('index', modal='signup'))
