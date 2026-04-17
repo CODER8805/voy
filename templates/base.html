@@ -18,11 +18,10 @@
     </div>
 
     <nav class="glass-nav">
-        <div class="logo">VoyageSync</div>
+        <a href="{{ url_for('index') }}" class="logo" style="text-decoration: none;">VoyageSync</a>
+        
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('flights') }}">Search Flights</a>
-            <a href="{{ url_for('hotels') }}">Search Hotels</a>
             {% if current_user %}
                 <a href="{{ url_for('profile') }}">Access Profile</a>
                 <a href="{{ url_for('logout') }}">Logout</a>
